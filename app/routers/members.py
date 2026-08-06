@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from fastapi import Response, status, HTTPException, Depends,APIRouter
 from starlette.concurrency import run_in_threadpool
-from app import class_models, tb_models
+from app import class_models, tb_models, utility_functions
 from app.utility_functions import id_gen
 from typing import Optional
 
@@ -15,11 +15,21 @@ router = APIRouter(
 async def create_member(member: class_models.MemCreation, db: Session = Depends(get_db)):
     def sync_db():
         mem_id = id_gen()
+        if utility_functions.num_val(9, member.member_id_number) or utility_functions.num_val(8, member.member_id_number):
+            member_id_num = member.member_id_number
+        else:
+            raise HTTPException(status_code=400, detail="I.D number length/type invalid")
+
+        if utility_functions.num_val(10, member.member_tell_number):
+            member_num = member.member_tell_number
+        else:
+            raise HTTPException(status_code=400, detail="Phone number length/type invalid")
+
         new_member = tb_models.Member(
             member_id=mem_id,
             member_name=member.member_name,
-            member_id_num=member.member_id_number,
-            member_tel=member.member_tell_number
+            member_id_num=member_id_num,
+            member_tel=member_num
         )
         db.add(new_member)
         db.commit()
