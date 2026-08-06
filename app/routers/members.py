@@ -65,6 +65,19 @@ async def update_member(
         if not member:
             raise HTTPException(status_code=404, detail="Member not found")
 
+        if mem_udpdate_data.member_id_number is not None:
+            if utility_functions.num_val(9, mem_udpdate_data.member_id_number) or utility_functions.num_val(8,
+                                                                                                  mem_udpdate_data.member_id_number):
+                pass
+            else:
+                raise HTTPException(status_code=400, detail="I.D number length/type invalid")
+
+        if mem_udpdate_data.member_tell_number is not None:
+            if utility_functions.num_val(10, mem_udpdate_data.member_tell_number):
+                pass
+            else:
+                raise HTTPException(status_code=400, detail="Phone number length/type invalid")
+
         update_data = mem_udpdate_data.model_dump(exclude_unset=True)
 
         # Map incoming Pydantic keys to exact database Column names
